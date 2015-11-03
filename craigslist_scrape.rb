@@ -20,16 +20,21 @@ require 'open-uri'
 
 
 CLNY = "https://newyork.craigslist.org"
+
 CLURL = "https://newyork.craigslist.org/search/aap"
 
-def lease_break_url
-	CLURL + "?" + "query=lease+break"
+# takes a string (search key word) as an argument
+def lease_break_url(string)
+	formated_string = string.gsub(" ", "+")
+	CLURL + "?" + "query=" + formated_string
 end
 
+# get the response in XML format given a url path
 def get_response_url
 	doc = Nokogiri::HTML(open(lease_break_url))
 end
 
+# returns the url path for each listing
 def get_listings_path
  listings = get_response_url.css('p.row')
  arr = Array.new
@@ -42,7 +47,7 @@ def get_listings_path
 end
 
 
-
+# return an array of hashes containing information about every listing scraped
 def listing_xml
 	content = {}
 	arr = []
@@ -58,6 +63,7 @@ def listing_xml
 		# binding.pry
 		ext_number = description.scan(/\d{2}[\s\d-]{5,}/)
 		ext_email = description.scan(/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/i)
+		binding.pry
 		arr << {title: title,
 						price: price,
 						room: room,
@@ -73,6 +79,7 @@ def listing_xml
 	binding.pry
 	arr
 end
+
 
 def get_email_from_reply_button
 	arr = []
